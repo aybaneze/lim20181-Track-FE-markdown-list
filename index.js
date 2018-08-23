@@ -4,12 +4,11 @@
 const fs = require('fs'); 
 const path = require('path');
 
-// const options = {
-//     validate: false,
-//     stats: false
-// }
 
-const exp = /\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi;
+const exp = /\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi;
+const expI = "(";
+const expF = ")";
+const cht = "]"; 
 
 const ReadFiles = (path) =>{
 fs.readFile(path,'utf-8', (err, data) => {
@@ -23,32 +22,41 @@ fs.readFile(path,'utf-8', (err, data) => {
 
 ReadFiles('README.md');
 
-countLink = [];
-
 const ReadData = (file) => {
-  let result = file.match(exp);  
-result.forEach(element => {
-  countLink= element;
-  const expF = ")"
-  let res = parseInt(element.indexOf(expF));
-  let link = element.substring(1,res);
-  console.log(link);
- console.log(countLink)
+  //guardo en una variable el dato que coincide con las expresiones regulares
+  let result = file.match(exp); 
+   countLink = []; 
+   result.forEach(elementData => {
+    let extrac = parseInt(elementData.indexOf(cht));
+    let ArrayText = elementData.substring(1,extrac);
+    let extracLink = parseInt(elementData.indexOf(expI));
+    let extracLinkEnd = parseInt(elementData.indexOf(expF))
+    let ArrayLink = elementData.substring(extracLink+1,extracLinkEnd);
+    const ObjLinks = {
+      text: ArrayText,
+      link: ArrayLink    
+    }
+   countLink.push(ObjLinks); 
+  
  }) 
+
+console.log(countLink);
+ return countLink; 
 };
 
 
 
-const validate = (element) => {
-  fetch(element)
-  .then((response)=>{
-    if(response.status < 400){
-    console.log("fail");
-  } else{
-    console.log("ok");
-  }
-  })
-  
-
-    
-  }
+//  const validate = (array) => {
+//  array.forEach(ElementL=>{
+//    let url = ElementL.link;
+//    let urlProm = new Request(url);
+// console.log(urlProm);
+//   fetch(urlProm)
+//   .then((response)=>{
+//     if(response.status < 400){
+//     console.log("ok");
+//   } else{
+//     console.log("fail");
+//   }
+//   }) 
+//  })}
