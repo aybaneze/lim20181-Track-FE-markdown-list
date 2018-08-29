@@ -1,42 +1,12 @@
 #!/usr/bin/env node
 
 //Guardamos en variable el modulo de fileSystem
-// const [,,, args]
 const fs = require('fs'); 
 const path = require('path');
 const fetch = require('node-fetch');
-
-// const pathUser = process.argv.slice(2); 
-// const pathArray = Object.values(pathUser);
-// const paths = pathArray[0];
-
-// const ReadFileOrDir = (dir) =>{  
-//       fs.lstat(dir, (err, stats) =>{
-//         if (err) {
-//             throw("Error");
-//         } else if(stats.isDirectory()){
-//             console.log('es carpeta')
-//             // const answer=readDir(change);
-//         } else if(stats.isFile()){
-//                 console.log('es archivo')
-//         }     
-//    }
-//       )}
-
-// ReadFileOrDir(paths);
-
-const ReadFiles = (path) =>{
-  //accede a un fichero para su lectura y que nos entregue en cadena
-fs.readFile(path,'utf-8', (err, data) => {
-    if(err) {
-        throw err
-    } else {
-      ReadData(data)
-    }
-  }); 
-}
-
-ReadFiles('textos/leer.md');
+const pathUser = process.argv.slice(2); 
+const pathArray = Object.values(pathUser);
+const paths = pathArray[0];
 
 const ReadData = (file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
@@ -60,19 +30,64 @@ const ReadData = (file) => {
    countLink.push(ObjLinks); 
   
  }) 
-validate(countLink);
+ console.log(countLink);
+// validateLinks(countLink);
  return countLink; 
 };
 
+const ReadFiles = (path) =>{
+  //accede a un fichero para su lectura y que nos entregue en cadena
+fs.readFile(path,'utf-8', (err, data) => {
+  if(err) {
+      throw err
+  } else {
+    console.log(typeof data);
+    ReadData(data)
+  }
+  }); 
+}
 
- const validate = (array) => {
- 
-  array.forEach(ElementL=>{
-   let url = ElementL.link;
-  fetch(url)
-  .then((response)=>{
-    console.log(response.status,response.statusText);
-   
-  }) 
-})
- } 
+const ReadFileOrDir = (dir) =>{  
+      fs.lstat(dir, (err, stats) =>{
+        if (err) {
+            throw("Error");
+        } else if(stats.isDirectory()){
+          fs.readdir(dir, (err,directory)=>{
+            if(err){
+              throw("Error");
+            }
+            else{
+            const files = directory.map(file => path.resolve(dir,file))
+                console.log(files);
+              } 
+            console.log('es carpeta');
+          })}
+         else if(stats.isFile()){
+           const file = path.resolve(dir);
+           ReadFiles(file);
+           console.log('es archivo'); 
+ }})}
+      
+ ReadFileOrDir(paths);
+
+
+
+
+//  const validateLinks = (array) => {
+//  const valLinksBroken = [];
+//   array.forEach(ElementL=>{
+//    let url = ElementL.link;
+//   fetch(url)
+//   .then((response)=>{
+//     const objValLinks = {
+//       statusNum : response.status,
+//       statusText: response.statusText
+//     }
+//     valLinksBroken.push(objValLinks)
+    
+//   }) 
+  
+// })
+// console.log(valLinksBroken);
+// return valLinksBroken;
+//  }  
