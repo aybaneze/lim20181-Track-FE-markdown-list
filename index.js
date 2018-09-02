@@ -16,24 +16,23 @@ let countT = 0;
 let validate = [];
 
  const validateLinks = (array) => {
+   
   array.forEach(ElementL=>{
    let url = ElementL.link;
    console.log(url)
   fetch(url)
   .then((response)=>{
-    if(response > 400){
-       console.log(response.status)
-    }else{
-      status = response.status;
-      statusText = response.statusText;
+    const objectStatus = {  
+      status : response.status,
+      statusText : response.statusText
     }
-  
-  })
-// console.log(arrValidate)  
+    return objectStatus;
+  }) 
 .catch(err => {
-  console.log(err);
+ let error = err.message;
+ error="Fail";
+  return error;
 })})}
-
 
 const ReadData = (path,file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
@@ -53,11 +52,12 @@ const ReadData = (path,file) => {
       text: ArrayText,
       link: ArrayLink,
       path: path,
+      status: null
       
     }
    countLink.push(ObjLinks); 
  }) 
-  validateLinks(countLink);
+  validateLinks(countLink)
  return countLink; 
 };
 
