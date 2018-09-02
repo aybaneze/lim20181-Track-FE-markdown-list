@@ -7,15 +7,37 @@ const fetch = require('node-fetch');
 const pathUser = process.argv.slice(2); 
 const pathArray = Object.values(pathUser);
 const paths = pathArray[0];
+let count = 0;
+let countT = 0;
+// const option = {
+//   validate: 
+//   stats:
+// }
+let validate = [];
 
-const ReadData = (file) => {
+ const validateLinks = (array) => {
+  array.forEach(ElementL=>{
+   let url = ElementL.link;
+  fetch(url)
+  .then((response)=>{
+    const arrValidate = array.map(arrVal=>{
+      console.log(arrVal);
+    })
+
+  
+}).catch(err => {
+  console.log(err.code);
+ 
+})})}
+
+
+const ReadData = (path,file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
   const exp = /\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi;
   const expI = "(";
   const expF = ")";
   const cht = "]"; 
   const result = file.match(exp); 
-  
   const countLink = []; 
    result.forEach(elementData => {
     const extrac = parseInt(elementData.indexOf(cht));
@@ -25,30 +47,30 @@ const ReadData = (file) => {
     const ArrayLink = elementData.substring(extracLink+1,extracLinkEnd);
     const ObjLinks = {
       text: ArrayText,
-      link: ArrayLink    
+      link: ArrayLink,
+      path: path   
     }
    countLink.push(ObjLinks); 
-  
  }) 
- console.log(countLink);
-// validateLinks(countLink);
+
+  validateLinks(countLink);
  return countLink; 
 };
 
-const ReadFiles = (path) =>{
+const ReadFiles = (dir,path) =>{
   //accede a un fichero para su lectura y que nos entregue en cadena
 fs.readFile(path,'utf-8', (err, data) => {
   if(err) {
       throw err
   } else {
-    console.log(typeof data);
-    ReadData(data)
+    ReadData(path,data)
   }
   }); 
 }
 
 const ReadFileOrDir = (dir) =>{  
-      fs.lstat(dir, (err, stats) =>{
+  let resultDirOrFile = [];
+    fs.lstat(dir, (err, stats) =>{
         if (err) {
             throw("Error");
         } else if(stats.isDirectory()){
@@ -57,37 +79,23 @@ const ReadFileOrDir = (dir) =>{
               throw("Error");
             }
             else{
-            const files = directory.map(file => path.resolve(dir,file))
-                console.log(files);
-              } 
-            console.log('es carpeta');
-          })}
+                   const files = directory.map(file => path.resolve(dir,file))
+                    
+                    resultDirOrFile= resultDirOrFile.concat(files);
+                   files.forEach(data=>{
+                     
+                     ReadFileOrDir(data);
+                   
+    
+                   })
+                
+          }})}
          else if(stats.isFile()){
            const file = path.resolve(dir);
-           ReadFiles(file);
-           console.log('es archivo'); 
+           ReadFiles(dir,file);
  }})}
-      
+
  ReadFileOrDir(paths);
 
 
 
-
-//  const validateLinks = (array) => {
-//  const valLinksBroken = [];
-//   array.forEach(ElementL=>{
-//    let url = ElementL.link;
-//   fetch(url)
-//   .then((response)=>{
-//     const objValLinks = {
-//       statusNum : response.status,
-//       statusText: response.statusText
-//     }
-//     valLinksBroken.push(objValLinks)
-    
-//   }) 
-  
-// })
-// console.log(valLinksBroken);
-// return valLinksBroken;
-//  }  
