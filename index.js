@@ -18,16 +18,20 @@ let validate = [];
  const validateLinks = (array) => {
   array.forEach(ElementL=>{
    let url = ElementL.link;
+   console.log(url)
   fetch(url)
   .then((response)=>{
-    const arrValidate = array.map(arrVal=>{
-      console.log(arrVal);
-    })
-
+    if(response > 400){
+       console.log(response.status)
+    }else{
+      status = response.status;
+      statusText = response.statusText;
+    }
   
-}).catch(err => {
-  console.log(err.code);
- 
+  })
+// console.log(arrValidate)  
+.catch(err => {
+  console.log(err);
 })})}
 
 
@@ -48,11 +52,11 @@ const ReadData = (path,file) => {
     const ObjLinks = {
       text: ArrayText,
       link: ArrayLink,
-      path: path   
+      path: path,
+      
     }
    countLink.push(ObjLinks); 
  }) 
-
   validateLinks(countLink);
  return countLink; 
 };
@@ -79,16 +83,11 @@ const ReadFileOrDir = (dir) =>{
               throw("Error");
             }
             else{
-                   const files = directory.map(file => path.resolve(dir,file))
-                    
+                   const files = directory.map(file => path.resolve(dir,file))               
                     resultDirOrFile= resultDirOrFile.concat(files);
                    files.forEach(data=>{
-                     
                      ReadFileOrDir(data);
-                   
-    
                    })
-                
           }})}
          else if(stats.isFile()){
            const file = path.resolve(dir);
