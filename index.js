@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 //Guardamos en variable el modulo de fileSystem
 const fs = require('fs'); 
 const path = require('path');
@@ -7,24 +6,19 @@ const fetch = require('node-fetch');
 const pathUser = process.argv.slice(2); 
 const pathArray = Object.values(pathUser);
 const paths = pathArray[0];
+const valUser = process.argv.slice(3); 
+const valObj = Object.values(valUser);
+const validate = valObj[0];
 
+const uniqueLink = (array) =>{array.link};
+const BrokLink = (array) =>{array.status>= 400};
 
-const ResolveValidate = (array) =>{
-  let count = 0
-  if(array.status === 200){
-    count+=1
-  }
- console.log(array)
-// const resultArr = [];
-// ReadFiles(arr,(err,data) => {
-//   data.forEach(dataArr=>{
-//     validateLinks(dataArr).then(response=>{
-//       resultArr.push(response);
-      
-//     })
-//   })
-// })
-}
+// const  result=[];
+
+const mdLinks = (array,options) =>{
+  console.log(array)
+ }
+
 
  const validateLinks = (array) => {    
   array.forEach(ElementL=>{
@@ -32,7 +26,7 @@ const ResolveValidate = (array) =>{
   .then((response)=>{
     ElementL.status = response.status;
     ElementL.statusText = response.statusText;
-    ResolveValidate(ElementL)
+    mdLinks(ElementL)
     return ElementL;
     
   }) 
@@ -43,12 +37,10 @@ const ResolveValidate = (array) =>{
    message = 'FAIL'
    ElementL.status= code;
    ElementL.statusText = message;
-   ResolveValidate(ElementL)
+   mdLinks(ElementL)
    return ElementL;
 })
-
 })
-
 }
 
 const ReadData = (path,file) => {
@@ -87,7 +79,6 @@ const ReadFiles = (dir,pathMD) =>{
   } else {
     ReadData(pathMD,data)
   }
-
   })
   return pathMD;
   }
