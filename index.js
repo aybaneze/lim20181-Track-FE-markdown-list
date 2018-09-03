@@ -7,32 +7,49 @@ const fetch = require('node-fetch');
 const pathUser = process.argv.slice(2); 
 const pathArray = Object.values(pathUser);
 const paths = pathArray[0];
-let count = 0;
-let countT = 0;
-// const option = {
-//   validate: 
-//   stats:
-// }
-let validate = [];
 
- const validateLinks = (array) => {
-   
+
+const ResolveValidate = (array) =>{
+  let count = 0
+  if(array.status === 200){
+    count+=1
+  }
+ console.log(array)
+// const resultArr = [];
+// ReadFiles(arr,(err,data) => {
+//   data.forEach(dataArr=>{
+//     validateLinks(dataArr).then(response=>{
+//       resultArr.push(response);
+      
+//     })
+//   })
+// })
+}
+
+ const validateLinks = (array) => {    
   array.forEach(ElementL=>{
-   let url = ElementL.link;
-   console.log(url)
-  fetch(url)
+   return fetch(ElementL.link)
   .then((response)=>{
-    const objectStatus = {  
-      status : response.status,
-      statusText : response.statusText
-    }
-    return objectStatus;
+    ElementL.status = response.status;
+    ElementL.statusText = response.statusText;
+    ResolveValidate(ElementL)
+    return ElementL;
+    
   }) 
 .catch(err => {
- let error = err.message;
- error="Fail";
-  return error;
-})})}
+   let code = err.code;
+   let message = err.code;
+   code = 404;
+   message = 'FAIL'
+   ElementL.status= code;
+   ElementL.statusText = message;
+   ResolveValidate(ElementL)
+   return ElementL;
+})
+
+})
+
+}
 
 const ReadData = (path,file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
@@ -40,7 +57,7 @@ const ReadData = (path,file) => {
   const expI = "(";
   const expF = ")";
   const cht = "]"; 
-  const result = file.match(exp); 
+  let result = file.match(exp); 
   const countLink = []; 
    result.forEach(elementData => {
     const extrac = parseInt(elementData.indexOf(cht));
@@ -48,42 +65,46 @@ const ReadData = (path,file) => {
     const extracLink = parseInt(elementData.indexOf(expI));
     const extracLinkEnd = parseInt(elementData.indexOf(expF))
     const ArrayLink = elementData.substring(extracLink+1,extracLinkEnd);
-    const ObjLinks = {
+    const ObjLink = {
       text: ArrayText,
       link: ArrayLink,
       path: path,
-      status: null
-      
+      status: null,
+      statusText: null
     }
-   countLink.push(ObjLinks); 
+   countLink.push(ObjLink); 
  }) 
   validateLinks(countLink)
  return countLink; 
 };
 
-const ReadFiles = (dir,path) =>{
+const ReadFiles = (dir,pathMD) =>{
   //accede a un fichero para su lectura y que nos entregue en cadena
-fs.readFile(path,'utf-8', (err, data) => {
+  if (path.extname(pathMD) === '.md') {
+  fs.readFile(pathMD,'utf-8', (err, data) => {
   if(err) {
       throw err
   } else {
-    ReadData(path,data)
+    ReadData(pathMD,data)
   }
-  }); 
-}
+
+  })
+  return pathMD;
+  }
+  }
 
 const ReadFileOrDir = (dir) =>{  
   let resultDirOrFile = [];
     fs.lstat(dir, (err, stats) =>{
         if (err) {
-            throw("Error");
+            console.log("Ingrese una ruta correcta");
         } else if(stats.isDirectory()){
           fs.readdir(dir, (err,directory)=>{
             if(err){
               throw("Error");
             }
             else{
-                   const files = directory.map(file => path.resolve(dir,file))               
+                   const files = directory.map(file => path.resolve(dir,file))             
                     resultDirOrFile= resultDirOrFile.concat(files);
                    files.forEach(data=>{
                      ReadFileOrDir(data);
