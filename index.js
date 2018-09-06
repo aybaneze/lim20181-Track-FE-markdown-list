@@ -3,44 +3,56 @@
 const fs = require('fs'); 
 const path = require('path');
 const fetch = require('node-fetch');
+//capturar el comando del usuario con la ruta
 const pathUser = process.argv.slice(2); 
 const pathArray = Object.values(pathUser);
 const paths = pathArray[0];
-const valUser = process.argv.slice(3); 
-const valObj = Object.values(valUser);
-const validate = valObj[0];
+// const valUser = process.argv.slice(3); 
+// const valObj = Object.values(valUser);
+// const validate = valObj[0];
 
-const uniqueLink = (array) =>{array.link};
-const BrokLink = (array) =>{array.status>= 400};
+// const uniqueLink = (array) =>{array.link};
+// const BrokLink = (array) =>{array.status>= 400};
 
 // const  result=[];
+const ResolveValidate = (arrResultadosLinks) =>{
 
-const mdLinks = (array,options) =>{
-  console.log(array)
- }
+ console.log(arrResultadosLinks)
+}
 
-
- const validateLinks = (array) => {    
-  array.forEach(ElementL=>{
-   return fetch(ElementL.link)
-  .then((response)=>{
-    ElementL.status = response.status;
-    ElementL.statusText = response.statusText;
-    mdLinks(ElementL)
-    return ElementL;
+ const validateLinks = (arrResultadosLinks) => {
+    const promesas = arrResultadosLinks
+      .map(link => new Promise((resolve, reject) => {
+        fetch(link.link)
+          .then(response => {
+            link.status = response.status;
+            link.statusText = response.statusText;
+            resolve(link)
+          })
+          .catch(err => {
+            let code = err.code;
+            let message = err.code;
+            code = 404;
+            message = 'FAIL'
+            link.status= code;
+            link.statusText = message;
+          
+            resolve(link)
+          })
+      })
+    )
     
-  }) 
-.catch(err => {
-   let code = err.code;
-   let message = err.code;
-   code = 404;
-   message = 'FAIL'
-   ElementL.status= code;
-   ElementL.statusText = message;
-   mdLinks(ElementL)
-   return ElementL;
-})
-})
+    Promise.all(promesas)
+      .then(respuestas => {
+        const resultadoFinal = []
+        respuestas.forEach(response => {
+          resultadoFinal.push(response)
+        })
+        console.log(resultadoFinal)
+      })
+      .catch(err => {
+        console.error(err)
+      })
 }
 
 const ReadData = (path,file) => {
@@ -79,6 +91,7 @@ const ReadFiles = (dir,pathMD) =>{
   } else {
     ReadData(pathMD,data)
   }
+
   })
   return pathMD;
   }
