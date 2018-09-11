@@ -7,22 +7,55 @@ const fetch = require('node-fetch');
 const pathUser = process.argv.slice(2); 
 const pathArray = Object.values(pathUser);
 const paths = pathArray[0];
-// const valUser = process.argv.slice(3); 
-// const valObj = Object.values(valUser);
-// const validate = valObj[0];
+const valUser = process.argv.slice(3); 
+const comand0 = valUser[0];
+const comand1 = valUser[1];
 
-// const uniqueLink = (array) =>{array.link};
-// const BrokLink = (array) =>{array.status>= 400};
-
-// const  result=[];
-const ResolveValidate = (arrResultadosLinks) =>{
-
- console.log(arrResultadosLinks)
+const option = {
+  validate : false,
+  stats : false
 }
 
- const validateLinks = (arrResultadosLinks) => {
-    const promesas = arrResultadosLinks
-      .map(link => new Promise((resolve, reject) => {
+const  mdLinks = (path,option) =>{
+readFileOrDir(path,option)
+}
+ 
+const selectOption =(path,option) =>{
+    if(comand0 === '--validate' & comand1 === '--stats' || comand0 === '--stats' & comand1 === '--validate'){
+    option.validate=true;
+    option.stats = true;
+    if(option.validate === true & option.stats === true ){
+      const objResults = {
+          total : path.length,
+          unique :  new Set(path.map(links=> links.link)).size,
+          broken : path.filter(link=> link.statusText === 'FAIL').length,
+          file : path[0].path
+      } 
+        return objResults;
+ }}else if(comand0 === '--validate'){
+    option.Validate=true;
+    if(option.Validate=true) {
+      return path} 
+  }else if(comand0 === '--stats'){
+    option.stats=true;
+     if(option.stats === true){
+      const objStats = {
+        total : path.length,
+        unique :  new Set(path.map(links=> links.link)).size,
+        file : path[0].path
+      }
+        return objStats;
+    }
+// }else if( comand0 !== '--validate' & comand1 !== '--stats' || comand0 !== '--stats' & comand1 !== '--validate'){
+//       console.log('Debe ingresar los comandos correctamente'+'\n'+'--stats'+'\n'+'--validate')  
+//   }
+ }}
+
+
+
+const validateLinks = (arrResultadosLinks) => {
+  const promesas = arrResultadosLinks
+    .map(link => new Promise((resolve, reject) => {
         fetch(link.link)
           .then(response => {
             link.status = response.status;
@@ -30,74 +63,55 @@ const ResolveValidate = (arrResultadosLinks) =>{
             resolve(link)
           })
           .catch(err => {
-            let code = err.code;
-            let message = err.code;
-            code = 404;
-            message = 'FAIL'
-            link.status= code;
-            link.statusText = message;
-          
+            err.code = 404;
+            err.message = 'FAIL';
+            link.status= err.code;
+            link.statusText = err.message;
             resolve(link)
           })
       })
-    )
-    
+    )    
     Promise.all(promesas)
       .then(respuestas => {
         const resultadoFinal = []
-        respuestas.forEach(response => {
-          resultadoFinal.push(response)
+        respuestas.forEach(response => {resultadoFinal.push(response)})
+        selectOption(resultadoFinal,option)
         })
-        console.log(resultadoFinal)
-      })
       .catch(err => {
         console.error(err)
       })
 }
-
 const ReadData = (path,file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
-  const exp = /\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi;
-  const expI = "(";
-  const expF = ")";
-  const cht = "]"; 
-  let result = file.match(exp); 
+let result = file.match(/\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi); 
   const countLink = []; 
-   result.forEach(elementData => {
-    const extrac = parseInt(elementData.indexOf(cht));
-    const ArrayText = elementData.substring(1,extrac);
-    const extracLink = parseInt(elementData.indexOf(expI));
-    const extracLinkEnd = parseInt(elementData.indexOf(expF))
-    const ArrayLink = elementData.substring(extracLink+1,extracLinkEnd);
+  result.forEach(elementData => {
     const ObjLink = {
-      text: ArrayText,
-      link: ArrayLink,
+      text: elementData.substring(1,parseInt(elementData.indexOf(']'))),
+      link: elementData.substring(parseInt(elementData.indexOf('('))+1,parseInt(elementData.indexOf(')'))),
       path: path,
-      status: null,
-      statusText: null
     }
    countLink.push(ObjLink); 
  }) 
+ console.log(countLink)
   validateLinks(countLink)
  return countLink; 
 };
-
 const ReadFiles = (dir,pathMD) =>{
   //accede a un fichero para su lectura y que nos entregue en cadena
   if (path.extname(pathMD) === '.md') {
-  fs.readFile(pathMD,'utf-8', (err, data) => {
-  if(err) {
-      throw err
-  } else {
-    ReadData(pathMD,data)
-  }
-
-  })
+      fs.readFile(pathMD,'utf-8', (err, data) => {
+        if(err) {
+          throw err
+        }else {
+          ReadData(pathMD,data)
+        }
+      })
   return pathMD;
   }
-  }
+}
 
-const ReadFileOrDir = (dir) =>{  
+const readFileOrDir = (dir) =>{ 
   let resultDirOrFile = [];
     fs.lstat(dir, (err, stats) =>{
         if (err) {
@@ -108,18 +122,16 @@ const ReadFileOrDir = (dir) =>{
               throw("Error");
             }
             else{
-                   const files = directory.map(file => path.resolve(dir,file))             
-                    resultDirOrFile= resultDirOrFile.concat(files);
-                   files.forEach(data=>{
-                     ReadFileOrDir(data);
-                   })
+              const files = directory.map(file => path.resolve(dir,file))             
+                resultDirOrFile= resultDirOrFile.concat(files);
+                   files.forEach(data=>{readFileOrDir(data)})
           }})}
          else if(stats.isFile()){
-           const file = path.resolve(dir);
-           ReadFiles(dir,file);
- }})}
+          ReadFiles(dir,path.resolve(dir));
+ }}
+)
+}
 
- ReadFileOrDir(paths);
-
-
-
+ mdLinks(paths,option);
+ 
+ module.exports=mdLinks;
