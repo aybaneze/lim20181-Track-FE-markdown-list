@@ -34,19 +34,23 @@ const selectOption = (path, option) => {
     }
     return objResults;
   } else if (option.validate) {
-    return path
+    const arrayValidate=[]
+    path.forEach(element=>{
+      for (let value in element){
+      arrayValidate.push(value+ " : " +element[value])
+    }})
+    return arrayValidate
   } else if (option.stats) {
     const objStats = {
       total: path.length,
       unique: new Set(path.map(links => links.link)).size,
     }
     return objStats;
-  }
+  } 
+  // else{
+  //   return path
+  // }
 }
-
-
-
-
 
 const validateLinks = (arrResultadosLinks) => {
   const promesas = arrResultadosLinks
@@ -91,8 +95,6 @@ const ReadData = (path, file) => {
   })
   return countLink;
 };
-
-
 
 const ReadFiles = (fileMd) => {
 

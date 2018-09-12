@@ -26,11 +26,7 @@ test('mdLinks(prueba.md, options)', () => {
   }
   return mdLinks('prueba.md', options)
     .then(response => {
-      expect(response).toEqual([ { text: 'Markdown',
-      link: 'https://es.wikipedia.org/wiki/Markdown',
-      path: 'C:\\Users\\AybañezE\\Documents\\lim20181-Track-FE-markdown-list\\prueba.md',
-      status: 200,
-      statusText: 'OK' } ])
+      expect(response).toEqual(["text : Markdown", "link : https://es.wikipedia.org/wiki/Markdown", "path : C:\\Users\\AybañezE\\Documents\\lim20181-Track-FE-markdown-list\\prueba.md", "status : 200", "statusText : OK"])
     })
 })
 
@@ -41,7 +37,10 @@ test('mdLinks(prueba.md, options)', () => {
   }
   return mdLinks('prueba.md', options)
     .then(response => {
-      expect(response).toEqual({ total: 1, unique: 1 })
+      expect(response).toEqual({
+        total: 1,
+        unique: 1
+      })
     })
 })
 
@@ -52,7 +51,8 @@ test('mdLinks(prueba.md, options)', () => {
   }
   return mdLinks('prueba.md', options)
     .then(response => {
-      expect(response).toEqual({ total: 1,
+      expect(response).toEqual({
+        total: 1,
         unique: 1,
         broken: 0,
       })
@@ -66,7 +66,11 @@ test('mdLinks(textos, options)', () => {
   }
   return mdLinks("textos", options)
     .then(response => {
-      expect(response).toEqual({ total: 67, unique: 32, broken: 1 })
+      expect(response).toEqual({
+        total: 67,
+        unique: 32,
+        broken: 1
+      })
     })
 })
 
@@ -77,10 +81,10 @@ test('mdLinks(prueba.md, options)', () => {
   }
   return mdLinks('prueba.md', options)
     .then(response => {
-      expect(response).toEqual({ total: 1,
+      expect(response).toEqual({
+        total: 1,
         unique: 1,
         broken: 0,
       })
     })
 })
-
