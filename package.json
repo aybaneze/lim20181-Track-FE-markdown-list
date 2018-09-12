@@ -7,7 +7,7 @@
     "test": "jest --coverage"
   },
   "bin": {
-    "md-links": "index.js"
+    "md-links": "cli.js"
   },
   "repository": {
     "type": "git",

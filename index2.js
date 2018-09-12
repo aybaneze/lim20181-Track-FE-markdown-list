@@ -1,27 +1,18 @@
-//Guardamos en variable el modulo de fileSystem
-const util = require ('util');
 const fs = require('fs');
-const readdirAsync = util.promisify(fs.readdir);
-const path = require('path')
+const path = require('path');
 const fetch = require('node-fetch');
 //capturar el comando del usuario con la ruta
 
 const mdLinks = (path, option) => {
   return new Promise((resolve, reject) => {
-    getFiles(path).then(arrFiles => {
-      Promise.all(arrFiles.map(fl => {
-        return ReadFiles(fl)
-      })).then(rs => {
-        const arrLinks = rs.reduce((a, f) => a.concat(f), [])
-        if (option.validate || option.stats) {
-          validateLinks(arrLinks).then(response => {
-            resolve(selectOption(response, option))
-          })
-        } else {
-          resolve(arrLinks)
-        }        
+    const functLinks = readFileOrDir(path, option);
+    if (option.validate || option.stats) {
+      validateLinks(functLinks).then(response => {
+        resolve(selectOption(response, option))
       })
-    })
+    } else {
+      resolve(functLinks);
+    }
   })
 }
 
@@ -31,6 +22,7 @@ const selectOption = (path, option) => {
       total: path.length,
       unique: new Set(path.map(links => links.link)).size,
       broken: path.filter(link => link.statusText === 'FAIL').length,
+      file: path[0].path
     }
     return objResults;
   } else if (option.validate) {
@@ -39,6 +31,7 @@ const selectOption = (path, option) => {
     const objStats = {
       total: path.length,
       unique: new Set(path.map(links => links.link)).size,
+      file: path[0].path
     }
     return objStats;
   }
@@ -73,9 +66,9 @@ const validateLinks = (arrResultadosLinks) => {
       })
       return resultadoFinal;
     })
-    // .catch(err => {
-    //   console.error(err)
-    // })
+    .catch(err => {
+      console.error(err)
+    })
 }
 const ReadData = (path, file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
@@ -100,37 +93,37 @@ const ReadFiles = (fileMd) => {
   if (path.extname(fileMd) === '.md') {
     const sinc = fs.readFileSync(fileMd, 'utf-8')
     return ReadData(fileMd, sinc)
-  } else {
-    return []
   }
 }
 
-function getFiles(dir) {
-  return new Promise((resolve, reject) => {
-    if (fs.lstatSync(dir).isFile()) {
-      resolve([path.resolve(dir)])
-    } else {
-      readdirAsync(dir).then(subdirs => {
-        Promise.all(subdirs.map((subdir) => {
-          const res = path.resolve(dir, subdir);
-          if (fs.lstatSync(res).isDirectory()) {
-            return getFiles(res)
-          } else {
-            return res
-          }
-        })).then(files => {
-          // ordeno los arrays
-          const r = files.reduce((a, f) => a.concat(f), [])
-          resolve(r.filter(el => {
-            if (el) return el
-          }))
-        })
-      })
-      // .catch(e => {
-      //   console.log("error", e.message)
-      // })
-    }    
-  })
- }
+const readFileOrDir = (dir) => {
+  let resultDirOrFile = [];
+  const statSync = fs.lstatSync(dir);
+  if (statSync.isDirectory()) {
+    const read = fs.readdirSync(dir);
+    resultDirOrFile = read.map(file => path.resolve(dir, file)).concat(resultDirOrFile)
+    console.log(resultDirOrFile)
+    resultDirOrFile = resultDirOrFile.map(data => {
+      readFileOrDir(data)
+    })
+    return resultDirOrFile
+    //const files = read.map(file => path.resolve(dir, file))
+    //resultDirOrFile = resultDirOrFile.concat(files);
+   // console.log(resultDirOrFile)
+     //resultDirOrFile.forEach(data => {
+       //readFileOrDir(data)
+     //})
+     //return resultDirOrFile
+  /*   files.forEach(data => {
+      console.log(data) //resuldirorfile = resultDirOrFile.concat(readFileordir)
+      readFileOrDir(data)
+    }) */
+
+  } else if (statSync.isFile()) {
+    return ReadFiles(path.resolve(dir));
+  }
+
+}
+
 
 module.exports = mdLinks;
