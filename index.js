@@ -104,7 +104,7 @@ const ReadFiles = (fileMd) => {
   }
 }
 
-function getFiles(dir) {
+const getFiles =(dir) => {
   return new Promise((resolve, reject) => {
     if (fs.lstatSync(dir).isFile()) {
       resolve([path.resolve(dir)])
@@ -123,7 +123,7 @@ function getFiles(dir) {
           resolve(r.filter(el => {
             if (el) return el
           }))
-        })
+        }).catch(err=>console.log('error'))
       })
     }    
   })
