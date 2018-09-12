@@ -26,7 +26,7 @@ fs (file system): para ingresar al sistemas de archivos.
 >> lstats : para saber si era archivo o carpeta.
 
 fetch : para poder realizar peticiones.
-
+npm 
 ## INSTALACION DE LA LIBRERIA
 
 Primero escribimos el comando "npm i andrea"

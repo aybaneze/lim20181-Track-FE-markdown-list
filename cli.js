@@ -15,6 +15,7 @@ const option = {
   }
 
 mdLinks(paths, option).then((response)=>{ 
+setTimeout(() => { 
 if(option.validate && option.stats){
   for (let value in response){
     console.log(value+ " : " +response[value])
@@ -29,5 +30,5 @@ response.forEach(element => {
   }else{
     console.log(element)
   }
-})}
+})}}, 12000)
 })

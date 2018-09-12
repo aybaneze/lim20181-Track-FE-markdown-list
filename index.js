@@ -77,10 +77,8 @@ const validateLinks = (arrResultadosLinks) => {
       })
       return resultadoFinal;
     })
-    // .catch(err => {
-    //   console.error(err)
-    // })
 }
+
 const ReadData = (path, file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
   let result = file.match(/\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi);
@@ -97,7 +95,6 @@ const ReadData = (path, file) => {
 };
 
 const ReadFiles = (fileMd) => {
-
   //accede a un fichero para su lectura y que nos entregue en cadena
   if (path.extname(fileMd) === '.md') {
     const sinc = fs.readFileSync(fileMd, 'utf-8')
@@ -128,9 +125,6 @@ function getFiles(dir) {
           }))
         })
       })
-      // .catch(e => {
-      //   console.log("error", e.message)
-      // })
     }    
   })
  }

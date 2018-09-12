@@ -64,13 +64,14 @@ test('mdLinks(textos, options)', () => {
     validate: true,
     stats: true
   }
+  jest.setTimeout(12000)
   return mdLinks("textos", options)
     .then(response => {
-      expect(response).toEqual({
-        total: 67,
+      expect(response).toEqual(
+        {total: 67,
         unique: 32,
-        broken: 1
-      })
+        broken: 1}
+      )
     })
 })
 
