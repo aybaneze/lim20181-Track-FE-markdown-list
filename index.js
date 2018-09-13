@@ -30,7 +30,7 @@ const selectOption = (path, option) => {
     const objResults = {
       total: path.length,
       unique: new Set(path.map(links => links.link)).size,
-      broken: path.filter(link => link.statusText === 'FAIL').length,
+      broken: path.filter(link => link.statusText === 'FAIL' || link.statusText === 'Not Found' ).length,
     }
     return objResults;
   } else if (option.validate) {
@@ -47,9 +47,6 @@ const selectOption = (path, option) => {
     }
     return objStats;
   } 
-  // else{
-  //   return path
-  // }
 }
 
 const validateLinks = (arrResultadosLinks) => {
