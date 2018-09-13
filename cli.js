@@ -17,16 +17,16 @@ const option = {
 mdLinks(paths, option).then((response)=>{ 
 setTimeout(() => { 
 if(option.validate && option.stats){
-  for (let value in response){
+  for (const value in response){
     console.log(value+ " : " +response[value])
   }}else if(option.stats){
-    for (let value in response){
+    for (const value in response){
       console.log(value+ " : " +response[value])
   }}else{
 response.forEach(element => {
   if(typeof element === 'object'){
-    for (let value in element){
-        console.log(value+ " : " +element[value])}
+    for (const value in element){
+      console.log(value+ " : " +element[value])}
   }else{
     console.log(element)
   }

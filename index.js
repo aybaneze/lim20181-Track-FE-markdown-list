@@ -9,14 +9,11 @@ const fetch = require('node-fetch');
 const mdLinks = (path, option) => {
   return new Promise((resolve, reject) => {
     getFiles(path).then(arrFiles => {
-      Promise.all(arrFiles.map(fl => {
-        return ReadFiles(fl)
-      })).then(rs => {
+      Promise.all(arrFiles.map(fl => ReadFiles(fl)))
+      .then(rs => {
         const arrLinks = rs.reduce((a, f) => a.concat(f), [])
         if (option.validate || option.stats) {
-          validateLinks(arrLinks).then(response => {
-            resolve(selectOption(response, option))
-          })
+          validateLinks(arrLinks).then(response => resolve(selectOption(response, option)))
         } else {
           resolve(arrLinks)
         }        
@@ -36,9 +33,8 @@ const selectOption = (path, option) => {
   } else if (option.validate) {
     const arrayValidate=[]
     path.forEach(element=>{
-      for (let value in element){
-      arrayValidate.push(value+ " : " +element[value])
-    }})
+      for (let value in element) arrayValidate.push(value+ " : " +element[value])
+    })
     return arrayValidate
   } else if (option.stats) {
     const objStats = {
@@ -69,16 +65,14 @@ const validateLinks = (arrResultadosLinks) => {
   return Promise.all(promesas)
     .then(respuestas => {
       const resultadoFinal = []
-      respuestas.forEach(response => {
-        resultadoFinal.push(response)
-      })
+      respuestas.forEach(response => resultadoFinal.push(response))
       return resultadoFinal;
     })
 }
 
 const ReadData = (path, file) => {
   //guardo en una variable el dato que coincide con las expresiones regulares
-  let result = file.match(/\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi);
+  const result = file.match(/\[([\s\w].*)\]\(((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi);
   const countLink = [];
   result.forEach(elementData => {
     const ObjLink = {
